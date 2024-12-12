@@ -6,6 +6,7 @@ import com.tristankechlo.random_mob_sizes.mixin_helper.MobMixinAddon;
 import com.tristankechlo.random_mob_sizes.sampler.ScalingSampler;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
@@ -22,12 +23,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /* Adds another EntityDataAccessor to the Mob class to store the scale factor */
 @Mixin(Mob.class)
-public abstract class MobMixin implements MobMixinAddon {
+public abstract class MobMixin extends LivingEntity implements MobMixinAddon {
 
     @Unique
     private boolean scaleLoot$RandomMobSizes = false;
     @Unique
     private boolean scaleExperience$RandomMobSizes = false;
+
+    private MobMixin(){ super(null, null); }
 
     @Override
     public boolean shouldScaleLoot$RandomMobSizes() {
@@ -59,7 +62,7 @@ public abstract class MobMixin implements MobMixinAddon {
         Difficulty difficulty = level.getDifficulty();
         double scaling = 1.0F;
         if (sampler != null) {
-            scaling = sampler.sample(level.getRandom(), level.getDifficulty());
+            scaling = sampler.sample(RandomSource.create(this.getUUID().hashCode()), level.getDifficulty());
 
             if (sampler.shouldScaleHealth(difficulty)) {
                 double healthScaling = sampler.getHealthScaler(difficulty).apply(scaling);
