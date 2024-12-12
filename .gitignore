@@ -18,6 +18,9 @@ build
 .gradle
 
 # other
+.vscode
+.eclipse
+.factorypath
 eclipse
 run
 runs
